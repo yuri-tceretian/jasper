@@ -1,0 +1,199 @@
+@media (min-width: 1020px) {
+  [role="main"] .container, /* for old GHE */
+  main .container, /* for header */
+  main .container-lg {
+    width: calc(100vw - 80px);
+    max-width: 1400px;
+  }
+
+  .container .discussion-timeline, /* for old GHE */
+  .container-lg .discussion-timeline {
+    width: calc(100vw - 300px);
+    max-width: 1160px;
+  }
+
+  .container .comment-holder, /* for old GHE */
+  .container-lg .comment-holder {
+    max-width: initial;
+  }
+
+  .container .timeline-new-comment, /* for old GHE */
+  .container-lg .timeline-new-comment {
+    max-width: initial;
+  }
+
+  body.full-width [role="main"] .container, /* for old GHE */
+  body.full-width .container .discussion-timeline, /* for old GHE */
+  body.full-width [role="main"] .container-lg,
+  body.full-width .container-lg .discussion-timeline {
+    max-width: none;
+  }
+}
+
+/* 不要なヘッダーを隠す */
+.gh-header-sticky,
+.gh-header .gh-header-sticky.is-stuck+.gh-header-shadow {
+  display: none !important;
+}
+
+/* color */
+:root {
+  --highlight-color: rgb(255,249,239);
+  --highlight-indicator-bg: #EAECEF;
+  --highlight-indicator-mark-bg: #2CBE4F;
+  --highlight-indicator-mark-border: #EAECEF;
+  --highlight-indicator-mark-done-bg: #9fdab0;
+}
+
+:root[data-color-mode=light][data-light-theme*=dark],
+:root[data-color-mode=dark][data-dark-theme*=dark] {
+  --highlight-color: #4f4d32;
+  --highlight-indicator-bg: #666666;
+  --highlight-indicator-mark-bg: #238c3c;
+  --highlight-indicator-mark-border: #666666;
+  --highlight-indicator-mark-done-bg: #323b32;
+}
+
+/* timeline */
+.timeline-comment.highlight-comment .timeline-comment-header {
+  background-color: var(--highlight-color) !important;
+}
+
+.timeline-comment.highlight-comment.timeline-comment--caret::after {
+  background: var(--highlight-color) !important;
+}
+
+.timeline-comment.highlight-comment:after {
+  border-right-color: var(--highlight-color) !important;
+}
+
+.review-comment.highlight-comment {
+  background-color: var(--highlight-color) !important;
+}
+
+.discussion-item-review.highlight-comment .comment-body {
+  background-color: var(--highlight-color) !important;
+}
+
+.discussion-item-review.highlight-comment .review-summary::after {
+  border-bottom-color: var(--highlight-color) !important;
+}
+
+.react-issue-comment.highlight-comment [data-testid="comment-header"] {
+  background-color: var(--highlight-color) !important;
+}
+
+/* diff body */
+.diff-body > header {
+  border: solid 1px #c0d3eb;
+  margin: 0.5em;
+  padding: 0.5em;
+  border-radius: 0.1em;
+  cursor: pointer;
+  color: #586069;
+  font-weight: 600;
+  background-color: rgb(255,249,239);
+}
+
+.diff-body > div {
+  display: none;
+  position: relative;
+  margin: 0.5em;
+}
+
+.diff-body > div > .diff-type-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: solid 1px #ddd;
+  width: 1.5em;
+  height: 1.5em;
+  line-height: 1.5em;
+  text-align: center;
+  font-size: 0.8em;
+  border-radius: 0.2em;
+  cursor: pointer;
+  background: #ddd;
+  color: #fff;
+  font-weight: bold;
+}
+
+.diff-body > div > pre {
+  overflow: scroll;
+  border: solid 1px #ddd;
+  padding: 0.5em;
+  white-space: pre-wrap;
+  background-color: #fafafa;
+}
+
+.diff-body .diff-body-add {
+  color: green;
+  background: #ddffdd;
+}
+
+.diff-body .diff-body-delete {
+  color: red;
+  background: #ffdddd;
+}
+
+/* scroll to top because show diff body */
+.scroll-to-top {
+  border: solid 1px #c0d3eb;
+  margin-top: 15px;
+  margin-left: 60px;
+  margin-bottom: 1em;
+  padding: 0.5em;
+  border-radius: 0.1em;
+  cursor: pointer;
+  color: #586069;
+  font-weight: 600;
+  background-color: rgb(255,249,239);
+}
+
+/*highlight indicator*/
+.highlight-indicator-wrap {
+  position: fixed;
+  top: 150px;
+  left: 4px;
+  width: 10px;
+  height: calc(100vh - 300px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+}
+
+.highlight-indicator {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background: var(--highlight-indicator-bg);
+  border-radius: 5px;
+}
+
+.highlight-indicator-mark {
+  position: absolute;
+  width: 100%;
+  min-height: 10px;
+  /*max-height: 80px;*/
+  background: var(--highlight-indicator-mark-bg);
+  cursor: pointer;
+  /*border: solid 1px #1f9c35;*/
+  border: solid 1px var(--highlight-indicator-mark-border);
+  box-sizing: border-box;
+  border-radius: 5px;
+}
+
+.highlight-indicator-scroll-current-pos {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+}
+
+.highlight-indicator-mark-done {
+  background: var(--highlight-indicator-mark-done-bg);
+}

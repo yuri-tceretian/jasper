@@ -1,5 +1,3 @@
-import {MainWindowIPC} from '../../IPC/MainWindowIPC';
-import {UserPrefIPC} from '../../IPC/UserPrefIPC';
 import {GitHubUserClient} from '../Library/GitHub/GitHubUserClient';
 import {setAppThemeName} from '../Library/Style/appTheme';
 import {RemoteGitHubHeaderEntity} from '../Library/Type/RemoteGitHubV3/RemoteGitHubHeaderEntity';
@@ -42,7 +40,7 @@ class _UserPref {
       }
     }
 
-    this.initTheme();
+    await this.initTheme();
 
     return {};
   }
@@ -56,7 +54,7 @@ class _UserPref {
       return {error, isPrefScopeError, isPrefNetworkError, isUnauthorized, githubUrl};
     }
 
-    this.initTheme();
+    await this.initTheme();
 
     return {};
   }
@@ -82,7 +80,7 @@ class _UserPref {
     this.prefs[this.getIndex()] = pref;
     await this.writePrefs(this.prefs);
 
-    this.initTheme();
+    await this.initTheme();
 
     return true;
   }
@@ -91,12 +89,12 @@ class _UserPref {
     const dbPath = this.getPref().database.path;
     if (!dbPath) return console.error('DB path is empty.');
 
-    await UserPrefIPC.deleteRelativeFile(dbPath);
+    await window.ipc.userPref.deleteRelativeFile(dbPath);
     const {prefs} = await this.readPrefs();
     prefs.splice(this.index, 1);
     await this.writePrefs(prefs);
 
-    await MainWindowIPC.reload();
+    await window.ipc.mainWindow.reload();
   }
 
   getPrefs(): UserPrefEntity[] {
@@ -120,7 +118,7 @@ class _UserPref {
   }
 
   async getDBPath(): Promise<string> {
-    return await UserPrefIPC.getAbsoluteFilePath(this.getPref().database.path);
+    return await window.ipc.userPref.getAbsoluteFilePath(this.getPref().database.path);
   }
 
   getThemeName(): ThemeNameEntity {
@@ -202,8 +200,8 @@ class _UserPref {
     return {};
   }
 
-  private initTheme() {
-    this.isSystemDarkMode = MainWindowIPC.isSystemDarkTheme();
+  private async initTheme() {
+    this.isSystemDarkMode = await window.ipc.mainWindow.isSystemDarkTheme();
     setAppThemeName(this.getThemeName());
   }
 
@@ -234,7 +232,7 @@ class _UserPref {
   }
 
   private async readPrefs(): Promise<{prefs?: UserPrefEntity[]; index?: number}> {
-    const text = await UserPrefIPC.read();
+    const text = await window.ipc.userPref.read();
     if (!text) return {};
     const prefs = JSON.parse(text) as UserPrefEntity[];
     return {prefs, index: 0};
@@ -242,7 +240,7 @@ class _UserPref {
 
   private async writePrefs(prefs: UserPrefEntity[]) {
     const text = JSON.stringify(prefs, null, 2);
-    await UserPrefIPC.write(text);
+    await window.ipc.userPref.write(text);
   }
 }
 

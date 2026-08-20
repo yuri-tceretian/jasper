@@ -1,29 +1,45 @@
-import os from 'os';
-import {app} from 'electron';
+import {app, nativeImage} from 'electron';
+import nodePath from 'node:path';
+import {browserViewIPCBind} from './IPC/BrowserViewIPC/BrowserViewIPC.bind';
+import {electronIPCBind} from './IPC/ElectronIPC/ElectronIPC.bind';
+import {mainWindowIPCBind} from './IPC/MainWindowIPC/MainWindowIPC.bind';
+import {nodeIPCBind} from './IPC/NodeIPC/NodeIPC.bind';
+import {SQLiteIPCBind} from './IPC/SQLiteIPC/SQLiteIPC.bind';
+import {streamIPCBind} from './IPC/StreamIPC/StreamIPC.bind';
+import {userPrefIPCBind} from './IPC/UserPrefIPC/UserPrefIPC.bind';
+import {BrowserViewService} from './Main/Service/BrowserViewService';
+import {IssueService} from './Main/Service/IssueService';
+import {MainWindowService} from './Main/Service/MainWindowService';
+import {StreamService} from './Main/Service/StreamService';
 import {MainWindow} from './Main/Window/MainWindow/MainWindow';
-import {MainWindowBind} from './Main/Bind/MainWindowBind';
-import {BrowserViewBind} from './Main/Bind/BrowserViewBind';
-import {UserPrefBind} from './Main/Bind/UserPrefBind';
-import {SQLiteBind} from './Main/Bind/SQLiteBind';
-import {IssueBind} from './Main/Bind/IssueBind';
-import {StreamBind} from './Main/Bind/StreamBind';
 
 async function index() {
-  if (os.platform() === 'win32') {
-    if (require('electron-squirrel-startup')) return;
+  await app.whenReady();
+
+  // 開発時のアイコンを設定
+  if (process.env.JASPER === 'DEV') {
+    const iconPath = nodePath.join(__dirname, 'Main/asset/image/jasper-dev.png');
+    app.dock.setIcon(nativeImage.createFromPath(iconPath));
   }
 
-  await app.whenReady();
+  // メインウィンドウを生成
   await MainWindow.init();
+  const window = MainWindow.getWindow();
+
+  // 各種サービスを初期化
+  MainWindowService.initWindow(window);
+  BrowserViewService.initWindow(window);
+  IssueService.initWindow(window);
+  StreamService.initWindow(window);
 
   // bind IPC
-  const window = MainWindow.getWindow();
-  await MainWindowBind.bindIPC(window);
-  await BrowserViewBind.bindIPC(window);
-  await UserPrefBind.bindIPC(window);
-  await SQLiteBind.bindIPC(window);
-  await IssueBind.bindIPC(window);
-  await StreamBind.bindIPC(window);
+  mainWindowIPCBind(window);
+  browserViewIPCBind();
+  streamIPCBind();
+  SQLiteIPCBind();
+  userPrefIPCBind();
+  electronIPCBind();
+  nodeIPCBind();
 
   await MainWindow.initRenderer();
 }

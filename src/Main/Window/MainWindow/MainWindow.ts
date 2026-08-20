@@ -1,9 +1,9 @@
-import os from 'os';
 import {app, BrowserWindow, BrowserWindowConstructorOptions, powerSaveBlocker, screen} from 'electron';
 import windowStateKeeper from 'electron-window-state';
+import nodePath from 'node:path';
+import os from 'os';
 import {MainWindowEvent} from './MainWindowEvent';
 import {MainWindowMenu} from './MainWindowMenu';
-import {PathUtil} from '../../Util/PathUtil';
 
 class _MainWindow {
   private mainWindow: BrowserWindow;
@@ -32,16 +32,13 @@ class _MainWindow {
       titleBarStyle: 'hiddenInset',
       webPreferences: {
         nodeIntegration: false,
-        preload: PathUtil.getPath('/Renderer/asset/html/main-window-preload.js'),
+        preload: nodePath.join(__dirname, 'Renderer/Preload/main-window-preload.js'),
       },
       x: mainWindowState.x || 0,
       y: mainWindowState.y || 0,
       width: mainWindowState.width,
       height: mainWindowState.height,
     };
-
-    // fixme: アイコンファイルを/Main/に持ってくる
-    if (this.isLinux()) options.icon = PathUtil.getPath('/Renderer/asset/image/icon.png');
 
     const mainWindow = new BrowserWindow(options);
 
@@ -69,7 +66,7 @@ class _MainWindow {
   }
 
   async initRenderer() {
-    await this.mainWindow.loadURL(`file://${PathUtil.getPath('/Renderer/asset/html/main-window.html')}`);
+    await this.mainWindow.loadFile(nodePath.join(__dirname, `Renderer/asset/html/main-window.html`));
     // await this.correctCookies();
 
     await this.rewritePrivateModeUserSessionCookie();
@@ -130,10 +127,6 @@ class _MainWindow {
       };
       await this.mainWindow.webContents.session.cookies.set(cookieDetail);
     }
-  }
-
-  private isLinux(): boolean {
-    return os.platform() === 'linux';
   }
 }
 
